@@ -1,5 +1,8 @@
-############################
+####################################################################
+#PS3
+###################################################################
 # 1-3
+###################################################################
 door<-list(1)#define the structure of the door function (the players curtain choice)
 class(door)<-"door" # list of value 1 or 2 or 3, depends on user input
 
@@ -18,8 +21,12 @@ PlayGame.door <-function(x,y){#We define the job of the function and assign it t
 #Because the function reruns the whole code we play a unique game every time
   #(**Have issue with unique games in four***)
 PlayGame.door()
+
+
 #####################################################
 #4
+#####################################################
+
 setClass(Class="door", #Here we define our class and slots
          representation=representation(
            x="numeric",#Stating the type of object which can exist in the class(a number)
@@ -31,16 +38,16 @@ setClass(Class="door", #Here we define our class and slots
          )
 )
 
+
 setValidity("door", function(object){#Here we perform a test to verify the logic of our class
-  x<-object@x
-  y<-object@y
-  test1<-all(object@x==object@x)#If these two variables exist outside the defined 
-  test2<-all(object@y==object@y)  #values (numeric) then return "wrong"
-  if(!test1 & !test2){return("wrong")}
-})
-#Let's test if our logic is valid
-test<-new("door",x="cat", y=1)
-#[returns error BUT not the DEFINED "wrong", WHY?]
+ if(is.numeric(object@x)==T){
+    return()
+  }else{
+    return("Wrong")
+  }
+
+ })
+
 
 setMethod("initialize", "door", function(.Object,...){
   value=callNextMethod()#Preliminary method calling a metho
@@ -48,10 +55,12 @@ setMethod("initialize", "door", function(.Object,...){
   return(value)
 })
 
+
 setGeneric("PlayGame", #Here we do a preliminary set up of the function for "Let's Make a Deal"
            function(object="door"){
              standardGeneric("PlayGame")
            })
+
 
 setMethod("PlayGame", "door",#Here we give the generic an actual argument to run
           
@@ -60,18 +69,12 @@ setMethod("PlayGame", "door",#Here we give the generic an actual argument to run
               return("Congratulations!")
             } else { return("Better Luck Next Time!")}   
           })
-#I don't know how to overcome this problem so I do it manually
-#Ideally I want to run the code game and input it into PlayGame()
-  #so that everytime I run game I get a unique output
-#HOWEVER, because I haven't figured that out the manual override would be
-  #to set up multiple games
-#[IF RESULTS LOOK SUSPICIOUS RERUN GAME1/2/3 AND PlayGame1/2/3 until you get unique values]
-
-game1<-new("door", x=c(1), y=c(sample(1:3,1)))#Set up three games made up of 
-game2<-new("door", x=c(1), y=c(sample(1:3,1)))  #x(players choice) & y(random curtain) 
-game3<-new("door", x=c(1), y=c(sample(1:3,1)))
 
 
+#The only way we can test multiple iterations is to make seperate games 
+game1<-new("door", x=1, y=c(sample(1:3,1)))#Set up three games made up of 
+game2<-new("door", x=1, y=c(sample(1:3,1)))  #x(players choice) & y(random curtain) 
+game3<-new("door", x=1, y=c(sample(1:3,1)))
 
 PlayGame(game1)#Here we play different iterations of the game
 PlayGame(game2)
@@ -86,4 +89,90 @@ PlayGame(game3)
 #> PlayGame(game3)            #
 #[1] "Better Luck Next Time!" #
 ###############################
+
+
+####################################################################
+#Class Assignment
+####################################################################
+#1-3
+
+statsstudent<-function(name){#Here is our initial function
+  courage<-sample(c(1:100), 1)#It randomly distributes characteristics to an unspecified name
+  ambition<-sample(c(1:100), 1)
+  intelligence<-sample(c(1:100), 1)
+  effort<-sample(c(1:100), 1) 
+  student <- list(name=name, courage=courage, ambition=ambition, intelligence=intelligence, effort=effort)
+  class(student) <- "student"#As requested we assign this to class "student"
+  return(student)#We are returned a list which have all the characteristics of the students and their name and class
+}
+
+dom<-statsstudent("dom")#two test functions
+carter<-statsstudent("carter")
+
+Sorthat<-function(x,...){#We set up preliminary code for a function to sort based upon the randomly dist. char.
+  UseMethod("Sorthat", x)
+}
+
+
+Sorthat.student<-function(x){#Guts of the function
+  charac <- c( x[[2]], x[[3]], x[[4]], x[[5]])#We can't call on a list in a function so we make a vector that contains the characteristics of interest
+  if(charac[1]==max(charac)){ #Then we say if courage is highest assign Gryffindor
+    class(x)<- c(class(x), "Gryffindor")#Then we give the student his class of student and concatenate that with his/her new assignment
+    print("GRYFFINDOR!")# An exciting proclamation
+    return(x)
+  } 
+  if(charac[2]==max(charac)){ #Then we say if ambition is highest assign Gryffindor
+    class(x)<- c(class(x), "Slytherin")
+    print("SLYTHERIN!")# A shitty proclamation
+    return(x)
+  } 
+  if(charac[3]==max(charac)){#Then we say if intelligence is highest assign Gryffindor
+    class(x)<- c(class(x), "Ravenclaw")
+    print("RAVENCLAW!")# I used to think I was smart
+    return(x)
+  } 
+  if(charac[4]==max(charac)){#Then we say if effort highest assign Gryffindor
+    class(x)<- c(class(x), "Hufflepuff")
+    print("HUFFLEPUFF!")#Every grad students assignment :/
+    return(x)
+  } 
+}
+
+dom_sorted<-Sorthat(dom)#Let's make sure this works
+cart_sorted <- Sorthat(carter)#And is producing unique outputs
+
+dom_sorted
+cart_sorted
+
+
+
+
+###########################################
+#4
+Gryffindor_Tower<-new.env()#Create the four environments
+Black_Lake<-new.env()
+Ravenclaw_Tower<-new.env()
+Basement<-new.env()
+
+
+curfew<-function(x,...){#We set up preliminary code for a function
+  UseMethod("curfew", x)
+}
+########## Beta testing this section ###############
+curfew.student<-function(name){
+  y<-class(Sorthat(statsstudent(name)))
+  #So my poor logic here is that we call on the class of the sorted value of the randomly generated info
+  # I make this y for comparison but I also feel like this function will encapsulate all of the previous
+  if(y=="Gryffindor"){# If whatever the input is has a class that equals one of the four 
+    Gryffindor_Tower<-x#then I want to put whatever into the relative environment
+  }
+  if(y=="Sytherin"){
+    Black_Lake<-x}
+  if(y=="Ravenclaw"){
+    Ravenclaw_Tower<-x}
+  if(y=="Hufflepuff"){
+    Basement<-x}
+}
+
+#But this crud doesn't work yet. Will Update
 
