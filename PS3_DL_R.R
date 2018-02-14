@@ -158,21 +158,29 @@ Basement<-new.env()
 curfew<-function(x,...){#We set up preliminary code for a function
   UseMethod("curfew", x)
 }
-########## Beta testing this section ###############
-curfew.student<-function(name){
-  y<-class(Sorthat(statsstudent(name)))
-  #So my poor logic here is that we call on the class of the sorted value of the randomly generated info
-  # I make this y for comparison but I also feel like this function will encapsulate all of the previous
-  if(y=="Gryffindor"){# If whatever the input is has a class that equals one of the four 
-    Gryffindor_Tower<-x#then I want to put whatever into the relative environment
-  }
-  if(y=="Sytherin"){
-    Black_Lake<-x}
-  if(y=="Ravenclaw"){
-    Ravenclaw_Tower<-x}
-  if(y=="Hufflepuff"){
-    Basement<-x}
+#The problem below uses class(dom_sorted)[2] to define the second class which should be associated 
+  #with where I have been sorted. Relying on that, I use if statements which say if your second
+    #assigned class is "" then assign that object to the specified environment
+class(dom_sorted)[2]
+curfew.student<-function(x){  #assign evironment by schools
+  name<-x$name
+  if(class(x)[2]=="Gryffindor"){
+    assign(name, "", envir = Gryffindor_Tower)}
+  if(class(x)[2]=="Slytherin"){
+    assign(name, "", envir = Black_Lake)}
+  if(class(x)[2]=="Ravenclaw"){
+    assign(name, "", envir = Ravenclaw_Tower)}
+  if(class(x)[2]=="Hufflepuff"){
+    assign(name, "", envir = Basement)}
 }
+#Use the function
+curfew(dom_sorted) 
+curfew(cart_sorted)
+#Check location
+ls(Gryffindor_Tower)  
+ls(Black_Lake)
+ls(Ravenclaw_Tower)
+ls(Basement)
 
 #But this crud doesn't work yet. Will Update
 
