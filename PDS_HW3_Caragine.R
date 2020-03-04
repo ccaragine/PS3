@@ -10,6 +10,19 @@ library(dplyr)
 library(tidyr)
 library(fivethirtyeight) 
 library(tidyverse) 
+install.packages('tm') 
+library(tm) 
+#install.packages('lubridate') 
+library(lubridate) 
+#install.packages('wordcloud') 
+library(wordcloud)
+library(qdap)
+library(stopwords)
+#install.packages("RColorBrewer")
+library(RColorBrewer)
+#install.packages("wordcloud2")
+library(wordcloud2)
+library(tidytext)
 
 ##################### Question 1 
 # Downloading/ subsetting data
@@ -105,5 +118,62 @@ p + theme_classic() +
   coord_flip() +
   theme(legend.position = "none")
 dev.off()
+
+###################### Question 4
+TWEETS <- read_csv('https://politicaldatascience.com/PDS/Datasets/trump_tweets.csv')
+
+# Date and Time
+hours <- format(as.POSIXct(strptime(TWEETS$created_at,"%m/%d/%Y %H:%M",tz="")) ,format = "%H:%M")
+dates <- format(as.POSIXct(strptime(TWEETS$created_at,"%m/%d/%Y %H:%M",tz="")) ,format = "%m/%d/%Y")
+
+dates <- mdy(dates)
+class(dates)
+dates[c(which.min(dates), which.max(dates))]
+# this data ranges from 1/1/2014 to 2/14/2020
+
+# removing retweets
+NOTWEETS <- filter(TWEETS, is_retweet==FALSE)
+
+TWEETS.POP <- arrange(NOTWEETS, desc(retweet_count))
+head(TWEETS.POP$retweet_count)
+head(TWEETS.POP$text)
+
+TWEETS.RE <- arrange(NOTWEETS, desc(favorite_count))
+head(TWEETS.RE$favorite_count)
+head(TWEETS.RE$text)
+
+# Removing extra stuff 
+TWEETS$textrm <- trimws(TWEETS$text)
+TWEETS$textrm <- removeNumbers(TWEETS$textrm)
+TWEETS$textrm <- removePunctuation(TWEETS$textrm)
+TWEETS$textrm <- tolower(TWEETS$textrm)
+words <- stopwords()
+TWEETS$textrm <- removeWords(TWEETS$textrm, words)
+words2 <- c('people', 'new','want','one','even','must','need','done','back','just','going', 'know', 'can','said','like','many','like','realdonaldtrump')
+TWEETS$textrm <- removeWords(TWEETS$textrm, words2)
+
+# Creating wordcloud
+textdata<-Corpus(VectorSource(TWEETS$textrm))
+
+dtm <- TermDocumentMatrix(textdata) 
+matrix <- as.matrix(dtm) 
+words <- sort(rowSums(matrix),decreasing=TRUE) 
+df <- data.frame(word = names(words),freq=words)
+
+tweets_words <-  TWEETS %>%
+  unnest_tokens(word, textrm)
+words <- tweets_words %>% group_by(word) %>% tally()
+
+
+
+wordcloud(words = words$word, freq=words$n, min.freq = 3, max.words=50, colors=brewer.pal("random-dark"))
+
+wordcloud2(data=TWEETS$textrm, size=1.6, color='random-dark')
+
+
+
+head(TWEETS$textrm)
+
+
 
 
