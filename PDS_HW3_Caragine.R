@@ -153,26 +153,13 @@ words2 <- c('people', 'new','want','one','even','must','need','done','back','jus
 TWEETS$textrm <- removeWords(TWEETS$textrm, words2)
 
 # Creating wordcloud
-textdata<-Corpus(VectorSource(TWEETS$textrm))
-
-dtm <- TermDocumentMatrix(textdata) 
-matrix <- as.matrix(dtm) 
-words <- sort(rowSums(matrix),decreasing=TRUE) 
-df <- data.frame(word = names(words),freq=words)
-
-tweets_words <-  TWEETS %>%
-  unnest_tokens(word, textrm)
-words <- tweets_words %>% group_by(word) %>% tally()
+pdf("C:/Users/cmcar/OneDrive/Documents/GitHub/PS3/cloud.pdf")
+wordcloud(words = TWEETS$textrm, min.freq = 3, max.words=50, colors=brewer.pal(8, "Dark2"))
+dev.off()
 
 
-
-wordcloud(words = words$word, freq=words$n, min.freq = 3, max.words=50, colors=brewer.pal("random-dark"))
-
-wordcloud2(data=TWEETS$textrm, size=1.6, color='random-dark')
-
-
-
-head(TWEETS$textrm)
+# Creating tdm 
+tdm <- TermDocumentMatrix(TWEETS$textrm, control = list(weighting = weightTfIdf))
 
 
 
