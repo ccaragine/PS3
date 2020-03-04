@@ -158,9 +158,10 @@ wordcloud(words = TWEETS$textrm, min.freq = 3, max.words=50, colors=brewer.pal(8
 dev.off()
 
 
-# Creating tdm 
-tdm <- TermDocumentMatrix(TWEETS$textrm, control = list(weighting = weightTfIdf))
+# Creating term document matrix 
+corpus <- with(TWEETS, VCorpus(VectorSource(textrm)))
+corpus[[1]] %>% 
+  as.character() %>% 
+  strwrap()
 
-
-
-
+tdm <- TermDocumentMatrix(corpus, control = list(weighting = weightTfIdf))
